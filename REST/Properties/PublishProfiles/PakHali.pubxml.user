@@ -130,7 +130,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/27/2012 13:00:52</publishTime>
     </File>
     <File Include="bin/REST.dll">
-      <publishTime>01/31/2022 20:34:04</publishTime>
+      <publishTime>02/02/2022 19:06:30</publishTime>
     </File>
     <File Include="bin/roslyn/csc.exe">
       <publishTime>06/18/2015 21:19:46</publishTime>

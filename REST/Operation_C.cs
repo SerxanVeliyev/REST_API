@@ -17,6 +17,9 @@ namespace REST
         public string Operation(int page, string _operator, string expeditor, string name, DateTime startdate, DateTime enddate)
         {
             page = Pagenation_number(page);
+            _operator = injection.injection_string(_operator);
+            expeditor = injection.injection_string(expeditor);
+            name = injection.injection_string(name);
             #region
             /*
              WITH OPERATION (ID,IL,AY,GUN,CREATEDDATE,OPERATORNAME,EXPEDİTORNAME,NAME,CONFIRM) AS(
@@ -64,10 +67,10 @@ namespace REST
 	                                        INNER JOIN USERS USRDRV ON USRDRV.ID=DRV.USERID
 	                                        INNER JOIN ITEMS İTM ON İTM.ID=ORD.ITEMID
                                         ORDER BY ORD.CREATEDDATE DESC
-                                        OFFSET 0 ROW
+                                        OFFSET @PAGINATIONID ROW
                                         )
-                                        SELECT TOP(10000) ID AS [id],IL AS [year],AY AS [month],GUN AS [day],CONVERT(nvarchar, CREATEDDATE, 20) AS [createDate],OPERATORNAME AS [operatorName] ,EXPEDİTORNAME AS [expeditorName],NAME AS [name],CONFIRM AS [confirm] FROM OPERATION
-										WHERE OPERATORNAME LIKE '%@OPERATOR%' AND EXPEDİTORNAME LIKE '%@EXPEDİTOR%'  AND NAME LIKE '%@NAME%' AND  CREATEDDATE BETWEEN '@STARTDATE'  AND '@ENDDATE'");
+                                        SELECT TOP(100) ID AS [id],IL AS [year],AY AS [month],GUN AS [day],CONVERT(nvarchar, CREATEDDATE, 20) AS [createDate],OPERATORNAME AS [operatorName] ,EXPEDİTORNAME AS [expeditorName],NAME AS [name],CONFIRM AS [confirm] FROM OPERATION
+										WHERE OPERATORNAME LIKE '%" + _operator + "%' AND EXPEDİTORNAME LIKE '%" + expeditor + "%'  AND NAME LIKE '%" + name + "%' AND  CREATEDDATE BETWEEN '" + startdate + "'  AND '" + enddate + "'");
 
             SQL_Com.Parameters.Add("@PAGINATIONID", SqlDbType.Int).Value = page;
 

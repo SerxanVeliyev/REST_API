@@ -12,7 +12,8 @@ namespace REST
             string[] ban_symbol = { "@", "!", "#", "&", "%", "$", "'", @"""", "OR", "AND", "\b", "\0", "\'", "\"", "\n", "\r", "\t", @"\z", "\\", @"\%", @"\_" };
             foreach (var item in ban_symbol)
             {
-                Text = Text.Replace(item, "");
+                if (!String.IsNullOrEmpty(Text))
+                    Text = Text.Replace(item, "");
             }
             return Text;
         }
