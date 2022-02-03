@@ -145,7 +145,7 @@ namespace REST
 
             SQL_Com = new SqlCommand("SELECT DISTINCT OperatorName FROM oper_sif");
             All_data = Jeson.ConvertDataTabletoString(SQL_Connect.Select(SQL_Com));
-
+            All_data += ",";
             SQL_Com = new SqlCommand("SELECT DISTINCT OrderStatus FROM oper_sif");
             All_data += Jeson.ConvertDataTabletoString(SQL_Connect.Select(SQL_Com));
 
