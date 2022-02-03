@@ -16,9 +16,10 @@ namespace REST
 
         public DataTable Select(SqlCommand com)
         {
+            Table = new DataTable();
             //"Server=135.125.178.166,1433;Database=PakXalcaWeb;User Id=sa;Password=Aa12345;"
             //"Server=PAKSRV;Database=PakXalcaWeb;User Id=sa;Password=Aa12345;"
-            using (SQL_CON = new SqlConnection("Server=PAKSRV;Database=PakXalcaWeb;User Id=sa;Password=Aa12345;"))
+            using (SQL_CON = new SqlConnection("Server=PAKSRV;Database=PakXalcaWeb;User Id=read;Password=read;"))
             {
                 SQL_Com = new SqlCommand();
                 SQL_Com = com;

@@ -138,6 +138,31 @@ namespace REST
             SQL_Com.Parameters.Add("@PAGINATIONID", SqlDbType.Int).Value = page;
 
             return Jeson.ConvertDataTabletoString(SQL_Connect.Select(SQL_Com));
+        } 
+        public string OperatorName_and_OrderStatus()
+        {
+            string All_data;
+
+            SQL_Com = new SqlCommand("SELECT DISTINCT OperatorName FROM oper_sif");
+            All_data = Jeson.ConvertDataTabletoString(SQL_Connect.Select(SQL_Com));
+
+            SQL_Com = new SqlCommand("SELECT DISTINCT OrderStatus FROM oper_sif");
+            All_data += Jeson.ConvertDataTabletoString(SQL_Connect.Select(SQL_Com));
+
+            return All_data;
+        }
+        public string OperatorName_and_OrderStatus_Dashboard(string OperatorName, string OrderStatus,DateTime startDate, DateTime endDate)
+        {
+            OperatorName = injection.injection_string(OperatorName);
+            OrderStatus = injection.injection_string(OrderStatus);
+            endDate.AddDays(1);
+            SQL_Com = new SqlCommand(@"select 
+                                            OperatorName,
+                                            OrderStatus,
+                                            sum(OrderCount) Toplam
+                                        from oper_sif
+                                        where OperatorName like '%" + OperatorName + "%' and OrderStatus like '%" + OrderStatus + "%' and CreatedDate between '" + startDate + "' and  '" + endDate + "'group by OperatorName,OrderStatus");
+            return Jeson.ConvertDataTabletoString(SQL_Connect.Select(SQL_Com));
         }
 
         public bool Security(string User, string Password)
