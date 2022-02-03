@@ -76,6 +76,69 @@ namespace REST
 
             return Jeson.ConvertDataTabletoString(SQL_Connect.Select(SQL_Com));
         }
+        public string Operation_order(int page, string _operator, string orderstatus, DateTime startdate, DateTime enddate)
+        {
+            page = Pagenation_number(page);
+            _operator = injection.injection_string(_operator);
+            orderstatus = injection.injection_string(orderstatus);
+            SQL_Com = new SqlCommand(@"WITH OPERATION (operatorName,CreatedDate,orderStatus,orderCount) AS(
+                SELECT usr.FullName AS OperatorName,
+					ord.CreatedDate,
+					(CASE 
+						WHEN ord.OrderStatus=0 THEN N'Sifariş götürüldü'
+						WHEN ord.OrderStatus=1 THEN N'Maraqlandı'
+						WHEN ord.OrderStatus=3 THEN N'İmtina'
+						ELSE 'Geri qaytarma'
+					END) OrderStatus,
+					COUNT(ord.OrderStatus) OrderCount
+				FROM Orders ord
+				INNER JOIN Users usr on usr.Id=ord.CreatedBy
+				WHERE ord.OrderStatus<>2
+				GROUP BY usr.FullName,
+					ord.CreatedDate,
+					ord.OrderStatus
+                ORDER BY ORD.CREATEDDATE DESC
+				OFFSET @PAGINATIONID ROW
+                )  
+                SELECT TOP(100) OperatorName as [operatorName], CONVERT(nvarchar, CREATEDDATE, 20) AS [createDate],OrderStatus AS [orderStatus], OrderCount AS [orderCount] FROM OPERATION
+                WHERE operatorName LIKE N'%" + _operator + "%' AND OrderStatus LIKE N'%" + orderstatus + "%' AND CreatedDate BETWEEN '" + startdate + "' AND '" + enddate + "'");
+            SQL_Com.Parameters.Add("@PAGINATIONID", SqlDbType.Int).Value = page;
+
+            return Jeson.ConvertDataTabletoString(SQL_Connect.Select(SQL_Com));
+        }
+        public string Product_sell(int page, string _operator, DateTime startdate, DateTime enddate)
+        {
+            page = Pagenation_number(page);
+            _operator = injection.injection_string(_operator);
+            SQL_Com = new SqlCommand(@"WITH OPERATION (FACT_NO,Expeditor_Name,GIVE_DATE,Product_Name,quantity,price,discount,amount,lastAmount,note) AS(
+	                                        SELECT (drv.Code+CAST(ord.Id AS varchar)) AS FACT_NO,
+		                                        usr.FullName AS Expeditor_Name,
+		                                        ordPc.CreatedDate AS GIVE_DATE,
+		                                        itm.Name AS Product_Name,
+		                                        pl.Quantity,
+		                                        pl.Price,
+		                                        pl.Discount,
+		                                        pl.Amount,
+		                                        pl.LastAmount,
+		                                        pl.Note
+	                                        FROM 
+	                                        Orders ord
+	                                        INNER JOIN Drivers drv on drv.Id=ord.DriverId
+	                                        INNER JOIN Users usr on usr.Id=drv.UserId
+	                                        INNER JOIN OrderProcess ordPc on ordPc.OrderId=ord.Id and ordPc.OperationStatus=2
+	                                        INNER JOIN OrderProcessLine pl on pl.OrderProcessId=ordPc.Id
+	                                        INNER JOIN Items itm on itm.Id=pl.ItemId and itm.ProductSales=1
+	                                        order by ordPc.CreatedDate DESC
+	                                        OFFSET @PAGINATIONID ROW  
+                                        )  
+                                        SELECT TOP(100) FACT_NO AS [texture], Expeditor_Name AS [expeditorName], CONVERT(nvarchar, GIVE_DATE, 20) AS [giveDate], Product_Name AS [productName], Quantity AS [quantity], 
+                                        Price AS [price], Discount AS [discount], Amount AS [amount], LastAmount AS [lastAmount], Note AS [note]
+                                        FROM OPERATION
+                                        where Expeditor_Name LIKE '%" + _operator + "%' AND GIVE_DATE BETWEEN '" + startdate + "' AND '" + enddate + "'");
+            SQL_Com.Parameters.Add("@PAGINATIONID", SqlDbType.Int).Value = page;
+
+            return Jeson.ConvertDataTabletoString(SQL_Connect.Select(SQL_Com));
+        }
 
         public bool Security(string User, string Password)
         {
